@@ -22,6 +22,7 @@
     "moongoose": "^0.0.5",
     "nayan-media-downloader": "^2.6.2",
     "node-telegram-bot-api": "^0.66.0",
+    "puppeteer": "^23.5.3",
     "tiktok-downloader": "^0.0.4",
     "tiktok-scraper": "^1.4.36",
     "uuid": "^10.0.0",

@@ -7,6 +7,7 @@ const axios = require('axios');
 const archiver = require('archiver');
 const { v4: uuidv4 } = require('uuid');
 const ytdl = require('@distube/ytdl-core');
+const puppeteer = require('puppeteer');
 require('dotenv').config();
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -176,47 +177,49 @@ bot.on('message', async (msg) => {
             { reply_to_message_id: msg.message_id },
           );
         }
-      } else if (url.includes('youtube.com/shorts/')) {
-        try {
-          const videoStream = ytdl(url, {
-            filter: (format) => format.container === 'mp4' && format.hasVideo && format.hasAudio,
-          });
-
-          const videoPath = path.join(__dirname, `${uuidv4()}.mp4`);
-          const writer = fs.createWriteStream(videoPath);
-
-          videoStream.pipe(writer);
-
-          writer.on('finish', async () => {
-            await bot.sendVideo(msg.chat.id, videoPath, {
-              reply_to_message_id: msg.message_id,
-            });
-            fs.unlinkSync(videoPath);
-          });
-
-          writer.on('error', (err) => {
-            console.error(err);
-            bot.sendMessage(
-              msg.chat.id,
-              'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
-              {
-                reply_to_message_id: msg.message_id,
-              },
-            );
-          });
-        } catch (error) {
-          console.error(error);
-          bot.sendMessage(
-            msg.chat.id,
-            'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
-            {
-              reply_to_message_id: msg.message_id,
-            },
-          );
-        }
       }
     }
   }
+
+  // else if (url.includes('youtube.com/shorts/')) {
+  //   try {
+  //     const videoStream = ytdl(url, {
+  //       filter: (format) => format.container === 'mp4' && format.hasVideo && format.hasAudio,
+  //     });
+
+  //     const videoPath = path.join(__dirname, `${uuidv4()}.mp4`);
+  //     const writer = fs.createWriteStream(videoPath);
+
+  //     videoStream.pipe(writer);
+
+  //     writer.on('finish', async () => {
+  //       await bot.sendVideo(msg.chat.id, videoPath, {
+  //         reply_to_message_id: msg.message_id,
+  //       });
+  //       fs.unlinkSync(videoPath);
+  //     });
+
+  //     writer.on('error', (err) => {
+  //       console.error(err);
+  //       bot.sendMessage(
+  //         msg.chat.id,
+  //         'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
+  //         {
+  //           reply_to_message_id: msg.message_id,
+  //         },
+  //       );
+  //     });
+  //   } catch (error) {
+  //     console.error(error);
+  //     bot.sendMessage(
+  //       msg.chat.id,
+  //       'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
+  //       {
+  //         reply_to_message_id: msg.message_id,
+  //       },
+  //     );
+  //   }
+  // }
 
   if (msg.chat.type === 'group' || msg.chat.type === 'supergroup') {
     await saveMedia(msg, mediaFolderPath);
