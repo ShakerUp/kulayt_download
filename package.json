@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon bot.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@distube/ytdl-core": "^4.14.4",
     "@sasmeee/igdl": "^1.0.0",
     "archiver": "^7.0.1",
     "axios": "^1.7.7",
@@ -17,10 +19,15 @@
     "instagram-scraper": "^1.0.6",
     "instagram-scraper-api": "^1.0.1",
     "jsdom": "^25.0.1",
+    "moongoose": "^0.0.5",
     "nayan-media-downloader": "^2.6.2",
     "node-telegram-bot-api": "^0.66.0",
     "tiktok-downloader": "^0.0.4",
     "tiktok-scraper": "^1.4.36",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "ytdl-core": "^4.11.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }

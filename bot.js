@@ -5,7 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const archiver = require('archiver');
-const { v4: uuidv4 } = require('uuid'); // Импортируем uuid для генерации уникальных идентификаторов
+const { v4: uuidv4 } = require('uuid');
+const ytdl = require('@distube/ytdl-core');
 require('dotenv').config();
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -93,7 +94,7 @@ async function saveMedia(msg, mediaFolderPath) {
 bot.onText(/\/start/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
-    'Привет! Отправь мне ссылку на Instagram Reels или TikTok, чтобы скачать видео.',
+    'Привет! Отправь мне ссылку на Instagram Reels, TikTok или YouTube Shorts, чтобы скачать видео.',
   );
 });
 
@@ -143,7 +144,6 @@ bot.on('message', async (msg) => {
             );
           }
         } catch (error) {
-          console.error(error);
           bot.sendMessage(
             msg.chat.id,
             'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
@@ -170,11 +170,48 @@ bot.on('message', async (msg) => {
             );
           }
         } catch (error) {
-          console.error(error);
           bot.sendMessage(
             msg.chat.id,
             'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
             { reply_to_message_id: msg.message_id },
+          );
+        }
+      } else if (url.includes('youtube.com/shorts/')) {
+        try {
+          const videoStream = ytdl(url, {
+            filter: (format) => format.container === 'mp4' && format.hasVideo && format.hasAudio,
+          });
+
+          const videoPath = path.join(__dirname, `${uuidv4()}.mp4`);
+          const writer = fs.createWriteStream(videoPath);
+
+          videoStream.pipe(writer);
+
+          writer.on('finish', async () => {
+            await bot.sendVideo(msg.chat.id, videoPath, {
+              reply_to_message_id: msg.message_id,
+            });
+            fs.unlinkSync(videoPath);
+          });
+
+          writer.on('error', (err) => {
+            console.error(err);
+            bot.sendMessage(
+              msg.chat.id,
+              'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
+              {
+                reply_to_message_id: msg.message_id,
+              },
+            );
+          });
+        } catch (error) {
+          console.error(error);
+          bot.sendMessage(
+            msg.chat.id,
+            'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
+            {
+              reply_to_message_id: msg.message_id,
+            },
           );
         }
       }
@@ -225,6 +262,6 @@ async function downloadVideo(videoUrl) {
 
   return new Promise((resolve, reject) => {
     writer.on('finish', () => resolve(videoPath));
-    writer.on('error', (error) => reject(error));
+    writer.on('error', (err) => reject(err));
   });
 }
