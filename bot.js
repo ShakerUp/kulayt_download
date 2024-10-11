@@ -7,7 +7,6 @@ const axios = require('axios');
 const archiver = require('archiver');
 const { v4: uuidv4 } = require('uuid');
 const ytdl = require('@distube/ytdl-core');
-const puppeteer = require('puppeteer');
 require('dotenv').config();
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
