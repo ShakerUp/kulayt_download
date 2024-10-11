@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const archiver = require('archiver');
+const { v4: uuidv4 } = require('uuid'); // Импортируем uuid для генерации уникальных идентификаторов
 require('dotenv').config();
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -131,14 +132,14 @@ bot.on('message', async (msg) => {
             const videoPath = await downloadVideo(videoUrl);
             await bot.sendVideo(msg.chat.id, videoPath, {
               contentType: 'video/mp4',
-              reply_to_message_id: msg.message_id, // Добавлено для ответа на сообщение
+              reply_to_message_id: msg.message_id,
             });
             fs.unlinkSync(videoPath);
           } else {
             bot.sendMessage(
               msg.chat.id,
               'Не удалось получить ссылку на видео. Проверьте, правильно ли вы указали ссылку.',
-              { reply_to_message_id: msg.message_id }, // Добавлено для ответа на сообщение
+              { reply_to_message_id: msg.message_id },
             );
           }
         } catch (error) {
@@ -146,7 +147,7 @@ bot.on('message', async (msg) => {
           bot.sendMessage(
             msg.chat.id,
             'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
-            { reply_to_message_id: msg.message_id }, // Добавлено для ответа на сообщение
+            { reply_to_message_id: msg.message_id },
           );
         }
       } else if (url.includes('tiktok.com/') || url.includes('vm.tiktok.com/')) {
@@ -157,18 +158,18 @@ bot.on('message', async (msg) => {
           if (videoUrl) {
             const videoPath = await downloadVideo(videoUrl);
             bot.sendMessage(msg.chat.id, 'Скачивание завершено! Отправляю видео...', {
-              reply_to_message_id: msg.message_id, // Добавлено для ответа на сообщение
+              reply_to_message_id: msg.message_id,
             });
             await bot.sendVideo(msg.chat.id, videoPath, {
               contentType: 'video/mp4',
-              reply_to_message_id: msg.message_id, // Добавлено для ответа на сообщение
+              reply_to_message_id: msg.message_id,
             });
             fs.unlinkSync(videoPath);
           } else {
             bot.sendMessage(
               msg.chat.id,
               'Не удалось получить ссылку на видео. Проверьте, правильно ли вы указали ссылку.',
-              { reply_to_message_id: msg.message_id }, // Добавлено для ответа на сообщение
+              { reply_to_message_id: msg.message_id },
             );
           }
         } catch (error) {
@@ -176,42 +177,45 @@ bot.on('message', async (msg) => {
           bot.sendMessage(
             msg.chat.id,
             'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
-            { reply_to_message_id: msg.message_id }, // Добавлено для ответа на сообщение
+            { reply_to_message_id: msg.message_id },
           );
         }
       }
     }
   }
+
   if (msg.chat.type === 'group' || msg.chat.type === 'supergroup') {
     await saveMedia(msg, mediaFolderPath);
   }
+
   if (msg.from.id === ADMIN_ID && msg.text === '/get_assets') {
     const assetsArchivePath = path.join(BASE_FOLDER, `assets_group_assets.zip`);
     await createArchive(BASE_FOLDER, assetsArchivePath);
     bot.sendMessage(msg.chat.id, 'Вот архив со всеми активами:', {
-      reply_to_message_id: msg.message_id, // Добавлено для ответа на сообщение
+      reply_to_message_id: msg.message_id,
     });
     await bot.sendDocument(msg.chat.id, assetsArchivePath, {
-      reply_to_message_id: msg.message_id, // Добавлено для ответа на сообщение
+      reply_to_message_id: msg.message_id,
     });
     fs.unlinkSync(assetsArchivePath);
   }
+
   if (msg.from.id === ADMIN_ID && msg.text === '/clear_assets') {
     if (fs.existsSync(BASE_FOLDER)) {
       fs.rmSync(BASE_FOLDER, { recursive: true, force: true });
       bot.sendMessage(msg.chat.id, 'Все активы были успешно удалены.', {
-        reply_to_message_id: msg.message_id, // Добавлено для ответа на сообщение
+        reply_to_message_id: msg.message_id,
       });
     } else {
       bot.sendMessage(msg.chat.id, 'Папка активов не найдена.', {
-        reply_to_message_id: msg.message_id, // Добавлено для ответа на сообщение
+        reply_to_message_id: msg.message_id,
       });
     }
   }
 });
 
 async function downloadVideo(videoUrl) {
-  const videoPath = path.join(__dirname, 'video.mp4');
+  const videoPath = path.join(__dirname, `${uuidv4()}.mp4`);
   const writer = fs.createWriteStream(videoPath);
 
   const response = await axios({
