@@ -94,7 +94,7 @@ async function saveMedia(msg, mediaFolderPath) {
 bot.onText(/\/start/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
-    'Привет! Отправь мне ссылку на Instagram Reels, TikTok или YouTube Shorts, чтобы скачать видео.',
+    'Привет! Отправь мне ссылку на Instagram Reels или TikTok, чтобы скачать видео.',
   );
 });
 
