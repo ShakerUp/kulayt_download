@@ -157,9 +157,6 @@ bot.on('message', async (msg) => {
 
           if (videoUrl) {
             const videoPath = await downloadVideo(videoUrl);
-            bot.sendMessage(msg.chat.id, 'Скачивание завершено! Отправляю видео...', {
-              reply_to_message_id: msg.message_id,
-            });
             await bot.sendVideo(msg.chat.id, videoPath, {
               contentType: 'video/mp4',
               reply_to_message_id: msg.message_id,
