@@ -212,48 +212,45 @@ bot.on('message', async (msg) => {
             { reply_to_message_id: msg.message_id },
           );
         }
-      }
+      } //else if (url.includes('youtube.com/shorts/')) {
+      //   try {
+      //     const videoStream = ytdl(url, {
+      //       filter: (format) => format.container === 'mp4' && format.hasVideo && format.hasAudio,
+      //     });
 
-      // Обработка YouTube Shorts
-      else if (url.includes('youtube.com/shorts/')) {
-        try {
-          const videoStream = ytdl(url, {
-            filter: (format) => format.container === 'mp4' && format.hasVideo && format.hasAudio,
-          });
+      //     const videoPath = path.join(__dirname, `${uuidv4()}.mp4`);
+      //     const writer = fs.createWriteStream(videoPath);
 
-          const videoPath = path.join(__dirname, `${uuidv4()}.mp4`);
-          const writer = fs.createWriteStream(videoPath);
+      //     videoStream.pipe(writer);
 
-          videoStream.pipe(writer);
+      //     writer.on('finish', async () => {
+      //       await bot.sendVideo(msg.chat.id, videoPath, {
+      //         reply_to_message_id: msg.message_id,
+      //       });
+      //       fs.unlinkSync(videoPath);
+      //     });
 
-          writer.on('finish', async () => {
-            await bot.sendVideo(msg.chat.id, videoPath, {
-              reply_to_message_id: msg.message_id,
-            });
-            fs.unlinkSync(videoPath);
-          });
-
-          writer.on('error', (err) => {
-            console.error(err);
-            bot.sendMessage(
-              msg.chat.id,
-              'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
-              {
-                reply_to_message_id: msg.message_id,
-              },
-            );
-          });
-        } catch (error) {
-          console.error(error);
-          bot.sendMessage(
-            msg.chat.id,
-            'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
-            {
-              reply_to_message_id: msg.message_id,
-            },
-          );
-        }
-      }
+      //     writer.on('error', (err) => {
+      //       console.error(err);
+      //       bot.sendMessage(
+      //         msg.chat.id,
+      //         'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
+      //         {
+      //           reply_to_message_id: msg.message_id,
+      //         },
+      //       );
+      //     });
+      //   } catch (error) {
+      //     console.error(error);
+      //     bot.sendMessage(
+      //       msg.chat.id,
+      //       'Произошла ошибка при скачивании видео. Пожалуйста, попробуйте позже.',
+      //       {
+      //         reply_to_message_id: msg.message_id,
+      //       },
+      //     );
+      //   }
+      // }
     }
   }
 });
